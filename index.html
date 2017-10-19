@@ -44,7 +44,7 @@ var svg = d3.select("body").append("svg")
 
 // get the data
 d3.csv("durham-police-crime-reports.csv", function(error, data) {
-  if (error) throw error;
+  if (error){ throw error; console.log("no data loading"); }
 
   // format the data
   data.forEach(function(d) {

@@ -1,0 +1,63 @@
+/* Globals */
+h1 {
+  font-family: Ubuntu;
+  font-weight: 500;
+  color: #343a40;
+  font-size: 3em;
+}
+
+h3 {
+  font-family: Ubuntu;
+  font-weight: 500;
+  color: #343a40;
+  font-size: 1.75em;
+}
+
+p {
+  font-family: Lato;
+  font-weight: 400;
+  color: #000000;
+  font-size: 1.25em;
+}
+a{
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 1.25em;
+}
+html, body {
+  background-color: #f8f9fa;
+}
+
+.newcontent{
+  padding-top: 1em;
+}
+
+.container {
+  padding-top: 3em;
+}
+
+@media screen and (max-width: 768px){
+  .newcontent{
+    padding-top: 0.5em;
+  }
+  .container{
+    padding-top: 1em;
+  }
+}
+@media screen and (max-width: 413px){
+  .newcontent{
+    padding-top: 0.3em;
+  }
+  .container{
+    padding-top: 1em;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  h3{
+    font-size: 1.5em;
+  }
+  p{
+    font-size: 1em;
+  }
+}

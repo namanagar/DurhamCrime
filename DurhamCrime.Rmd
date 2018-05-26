@@ -1,0 +1,149 @@
+---
+title: "Fact checking Steve Schewel's claim about Durham gun violence"
+author: "Naman Agarwal"
+date: "10/30/2017"
+output:
+  prettydoc::html_pretty:
+    theme: leonids
+    highlight: github
+---
+
+# Mayoral candidate Steve Schewel says someone is shot in Durham every two days
+
+In the hot race to replace Durham mayor Bill Bell, one of City Councilman Steve Schewel's main talking points has been about the Bull City's gun problem and how he plans to reduce it by creating gun control measures.
+
+In a candidate questionnaire with IndyWeek in September, Schewel stated that **"Every two days someone in Durham is shot with a gun and killed or wounded."**
+
+Every two days seems like an awfully high amount of gun crime, and Schewel is known to repeat this particular talking point often. He was also quoted at a mayoral candidate forum as saying "Every two days, someone in Durham gets shot. Not just shot at, actually shot."
+
+Schewel's statement doesn't mean to say that literally that someone is shot every two days with a skip every other day, but rather that that someone is shot *on average* every two days, so that's the claim for our purposes. So does someone actually get shot every two days in Durham?
+
+## The data speaks
+
+```{r echo = FALSE, results='asis'}
+library(knitr)
+library(ggplot2)
+library(tidyr)
+crime = read.csv("./durham-police-crime-reports.csv", sep = ",")
+kable(head(crime[,c("ï..INCI_ID", "STRDATE", "REPORTEDAS", "CHRGDESC")], 10))
+```
+
+Using a dataset of Durham Police Crime Reports from 2013 through Aug. 26, 2017 that looks somewhat like the one above, I found that of the 121,461 total crimes reported in the date range, 709 of them were reported as gunshot wounds, which would fit Schewel's statement that someone is shot, "not just shot at."
+
+In the first 238 days of 2017 alone - from New Year's Day to Aug. 26, where the last data point is recorded - there have been 145 gunshot wounds. That means that a gunshot wound is reported in Durham **every 1.64 days** on average. Stated another way, on a given day in this range, there is a 61% chance a gunshot wound is reported.
+
+However, many sources of research point to the idea that violent crime rates rise in the summer, so since 2017 doesn't yet have data for October-December, the data could be disproportionately showing higher rates of gunshot wounds since all the summer data is being counted and cold weather data isn't as well represented.
+
+Visualizing Durham's reported gunshot wounds as a heatmap, we can see that Durham does follow the national pattern: the number of gunshot wounds tend to be higher in the summer.
+
+```{r}
+# Get the Month vs Year table and turn it into a dataframe
+heattable = xtabs(~ MONTHSTAMP + YEARSTAMP, crime)
+heatmatrix = as.data.frame.matrix(heattable)
+monthlist =  c("January","February","March","April","May","June","July","August","September","October","November","December")
+heatmatrix$month = monthlist
+
+# Use tidyr to turn it into a tidy (long) dataset, for ggplot
+tidy1 = heatmatrix %>%
+          gather(year, value, `2013`:`2017`, -month)
+
+# Prevent alphabetical sort 
+tidy1$month = factor(tidy1$month, levels=rev(monthlist))
+
+# Color values
+dark.orange <- '#F5A623'
+light.gray <- '#f8f8f8'
+
+# Heatmap
+plot = ggplot(tidy1, aes(x=year, y=month, label=value)) +
+  geom_tile(aes(fill=value), colour='white') +
+  scale_fill_gradient(low=light.gray, high=dark.orange, limits=c(0, max(tidy1$value))) +
+  geom_text()
+
+plot = plot + labs(title='Number of Gunshot Wounds in Durham, Jan. 2013 - Aug. 2017', x="Year", y="Month") +
+  theme(
+    panel.background=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.ticks.y=element_blank()
+  )
+
+plot
+```
+
+The numbers for 2016, the most recent year for which we have a full set of data for, reflect only slightly better for Durham. Since 2016 was a leap year, there were 366 days. The dataset shows 201 gunshot wounds, meaning that someone was shot on average **every 1.82 days**. On a given day in 2016, there was about a 55% chance that someone was shot.
+
+Someone is actually shot in Durham more often than every two days on average, based on the numbers for 2016 and 2017 so far. What that heatmap also reveals, however, is that the number of gunshot wounds has been steadily rising over the past four years.
+
+## It wasn't always this way
+
+```{r}
+bar = ggplot(crime, aes(crime$YEARSTAMP)) + 
+  geom_bar(fill="#F36170")
+
+bar = bar + labs(title='Total Gunshot Wounds in Durham, Jan. 2013 - Aug. 2017', x="Year", y="Number of Gunshot Wounds")
+
+bar
+```
+
+Looking at the data as a simple histogram, we see that there were only 73 gunshot wounds reported in 2013 and 103 in 2014. Then, there's a spike up to 187 wounds and 201 in 2015 and 2016, respectively. And as discussed previously, 2017 is on pace to set even higher numbers.
+
+**In less than four years, Durham has gone from a place where someone is shot every 5 days to a place where someone is shot more than every two days.** Or so the data seems to suggest. When I reached out to Schewel about crime statistics, he pointed out that an increase in gun crime of that magnitude would be extremely unlikely.
+
+"Let me say, though, that I very much doubt that gunshot wounds have increased by 150% in Durham in the last four years," Schewel said in an email. "That doesn't seem at all likely to me, so it would be worth re-checking those figures."
+
+Samuel McClenney, the Open Data Program Manager for Durham City and County, told me in an email that Police Department has an internal dataset that they sanitize before sending to him, so the numbers could have discrepancies.
+
+## Misleading data?
+
+I reached out to the Durham Police Department about how the data was collected and if there have been any changes in the dataset to see if that data could be misleading.
+
+Eric Arrington, a crime analyst, told me in an interview that the field I was using in my data to select for gunshot wounds could definitely be misleading.
+
+"The 'reportedas' field comes from the cad (Computer Aided Dispatch) and does not always reflect what the resulting offense in the police report end up becoming," Arrington said. "For example, a call may come in as a 'gunshot wound' but end up being something not related to a gun at all."
+
+He went on to say that the actual dataset that includes the field for what the call ends up being is unavailable for public use. Even then, filtering the data into a more complex histogram by what the crime was ultimately charged as still shows a majority of reported gunshot wounds as aggravated assaults, homicides, robberies, or other gun-related crimes, so even if the data might be off due to this error, Arrington said it would be representative of overall crime data.
+
+```{r fig1, fig.height = 6}
+comp = ggplot(crime) + 
+  geom_bar(mapping = aes(crime$YEARSTAMP, fill= crime$CHRGDESC), position = "stack")
+
+# title='Total Gunshot Wounds in Durham by Type, Jan. 2013 - Aug. 2017',
+comp = comp + labs(title='Total Gunshot Wounds in Durham by Type, Jan. 2013 - Aug. 2017', x="Year", y="Number of Gunshot Wounds") + scale_x_discrete(name = "Year", limits = c(2013, 2014, 2015, 2016, 2017)) + guides(fill=guide_legend(title = "Charge"))
+
+comp
+```
+
+Using the internal PD dataset, Arrington confirmed Schewel's statement.
+
+"You said that you were looking into Mr. Schewel's statement: 'Every two days someone in Durham is shot with a gun and killed or wounded.' **That is essentially a true statement**," Arrington said. "Through Monday (10/23/17), we have had 586 shooting incidents YTD, with 192 persons hit in 168 incidents."
+
+Jason Scheiss, the Analytical Services Manager at the Durham Police Department, further confirmed Arrington's statements in an email.
+
+## The ruling
+
+Mayoral candidate Steve Schewel claimed that someone in shot every two days in Durham.
+
+His claim is supported by city data openly available to the public and multiple experts who work on analyzing Durham's violent crime.
+
+With an overwhelming amount of support and really nothing that would suggest otherwise, I rate his claim **true.**
+
+
+## Sources
+
+[OpenDurham dataset on crime reports, updated every few days](https://opendurham.nc.gov/explore/dataset/durham-police-crime-reports/)
+
+[Bureau of Justice Statistics study on seasonal crime rates, June 17, 2014](https://www.bjs.gov/index.cfm?ty=pbdetail&iid=5028)
+
+[Iowa State study on seasonal crime rates, 2001](http://public.psych.iastate.edu/caa/abstracts/2000-2004/01A.pdf)
+
+[Steve Schewel candidate questionnaire, September 2017](https://www.indyweek.com/indyweek/steve-schewel/Content?oid=8186939)
+
+Eric Arrington, crime analyst, Durham Police Department, phone and email exchange Oct. 26, 2017
+
+Samuel McClenney, data manager, Durham City and County, email exchange Oct. 23, 2017
+
+Jason Scheiss, analytical services manager, Durham Police Department, email exchange Oct. 27, 2017
+
+---
+
+All graphs/charts/analysis here were done using R and various [tidyverse](https://www.tidyverse.org/) packages. This webpage is an R Markdown document knitted to HTML by `knitr` and the package `prettydoc`. Thanks for reading!

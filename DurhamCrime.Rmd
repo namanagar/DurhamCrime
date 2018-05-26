@@ -60,7 +60,8 @@ plot = ggplot(tidy1, aes(x=year, y=month, label=value)) +
   scale_fill_gradient(low=light.gray, high=dark.orange, limits=c(0, max(tidy1$value))) +
   geom_text()
 
-plot = plot + labs(title='Number of Gunshot Wounds in Durham, Jan. 2013 - Aug. 2017', x="Year", y="Month") +
+plot = plot + 
+  labs(title='Number of Gunshot Wounds in Durham, Jan. 2013 - Aug. 2017', x="Year", y="Month") +
   theme(
     panel.background=element_blank(),
     axis.ticks.x=element_blank(),
@@ -108,7 +109,10 @@ comp = ggplot(crime) +
   geom_bar(mapping = aes(crime$YEARSTAMP, fill= crime$CHRGDESC), position = "stack")
 
 # title='Total Gunshot Wounds in Durham by Type, Jan. 2013 - Aug. 2017',
-comp = comp + labs(title='Total Gunshot Wounds in Durham by Type, Jan. 2013 - Aug. 2017', x="Year", y="Number of Gunshot Wounds") + scale_x_discrete(name = "Year", limits = c(2013, 2014, 2015, 2016, 2017)) + guides(fill=guide_legend(title = "Charge"))
+comp = comp + 
+  labs(title='Total Gunshot Wounds in Durham by Type, Jan. 2013 - Aug. 2017', x="Year", y="Number of Gunshot Wounds") + 
+  scale_x_discrete(name = "Year", limits = c(2013, 2014, 2015, 2016, 2017)) + 
+  guides(fill=guide_legend(title = "Charge"))
 
 comp
 ```
@@ -146,4 +150,4 @@ Jason Scheiss, analytical services manager, Durham Police Department, email exch
 
 ---
 
-All graphs/charts/analysis here were done using R and various [tidyverse](https://www.tidyverse.org/) packages. This webpage is an R Markdown document knitted to HTML by `knitr` and the package `prettydoc`. Thanks for reading!
+All graphs/charts/analysis here were done using R and the `ggplot2` & `tidyr` packages with the relevant code above in order to reproduce it. (Some analysis is omitted in the code for brevity.) This webpage is an R Markdown document knitted to HTML by `knitr` and the package `prettydoc`. Thanks for reading!

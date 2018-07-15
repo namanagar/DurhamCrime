@@ -36,7 +36,7 @@ However, many sources of research point to the idea that violent crime rates ris
 
 Visualizing Durham's reported gunshot wounds as a heatmap, we can see how Durham gun violence fluctuates month to month, with the very highest values in the winter. Note that the 2017 data for this (and all further charts) is only through August, since that's the most updated version of the dataset I could use.
 
-```{r}
+```{r echo = FALSE}
 # Get the Month vs Year table and turn it into a dataframe
 heattable = xtabs(~ MONTHSTAMP + YEARSTAMP, crime)
 heatmatrix = as.data.frame.matrix(heattable)
@@ -77,7 +77,7 @@ On average, based on the numbers for 2016 and 2017 so far, someone is shot just 
 
 ## It wasn't always this way
 
-```{r}
+```{r echo = FALSE}
 bar = ggplot(crime, aes(crime$YEARSTAMP)) + 
   geom_bar(fill="#F36170")
 
@@ -104,7 +104,7 @@ Eric Arrington, a crime analyst, told me in an interview that the field I was us
 
 He went on to say that the actual dataset that includes the field for what the call ends up being is unavailable for public use. Even then, filtering the data into a more complex histogram by what the crime was ultimately charged as still shows a majority of reported gunshot wounds as aggravated assaults, homicides, robberies, or other gun-related crimes, so even if the data might be off due to this error, Arrington said it would be representative of overall crime data.
 
-```{r fig1, fig.height = 6}
+```{r fig1, fig.height = 6, echo=FALSE}
 comp = ggplot(crime) + 
   geom_bar(mapping = aes(crime$YEARSTAMP, fill= crime$CHRGDESC), position = "stack")
 
